@@ -64,6 +64,14 @@ def test_diff_deep_nesting():
     assert changes[0].kind == "changed"
 
 
+def test_diff_returns_list_of_change_objects():
+    """Ensure every item returned by diff is a Change instance."""
+    expected = {"a": 1, "b": {"c": 2}}
+    actual = {"a": 9, "b": {"c": 2}, "d": 5}
+    changes = diff(expected, actual)
+    assert all(isinstance(c, Change) for c in changes)
+
+
 def test_change_str_changed():
     c = Change(path="foo.bar", expected="old", actual="new", kind="changed")
     assert "changed" in str(c)
