@@ -57,9 +57,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _validate_paths(args: argparse.Namespace) -> str | None:
+    """Validate that the supplied file/directory path exists and is the right type.
+
+    Returns an error message string if validation fails, otherwise ``None``.
+    """
+    if args.file:
+        if not args.file.exists():
+            return f"File not found: {args.file}"
+        if not args.file.is_file():
+            return f"Path is not a file: {args.file}"
+    else:
+        if not args.dir.exists():
+            return f"Directory not found: {args.dir}"
+        if not args.dir.is_dir():
+            return f"Path is not a directory: {args.dir}"
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    path_error = _validate_paths(args)
+    if path_error:
+        print(f"[error] {path_error}", file=sys.stderr)
+        return 2
 
     try:
         if args.file:
