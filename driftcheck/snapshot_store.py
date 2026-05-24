@@ -48,3 +48,19 @@ class SnapshotStore:
             if fname.endswith(".json"):
                 resources.append(fname[:-5].replace("__", "/"))
         return resources
+
+    def load_all(self) -> List[Snapshot]:
+        """Load and return all snapshots currently held in the store.
+
+        Snapshots are returned in the same order as :meth:`list_resources`
+        (alphabetical by resource name).  Any snapshot file that cannot be
+        read is skipped and a warning is printed rather than aborting the
+        entire operation.
+        """
+        snapshots = []
+        for resource in self.list_resources():
+            try:
+                snapshots.append(self.load(resource))
+            except SnapshotError as exc:
+                print(f"Warning: could not load snapshot for {resource!r}: {exc}")
+        return snapshots
